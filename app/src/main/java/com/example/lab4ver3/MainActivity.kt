@@ -24,6 +24,9 @@ class MainActivity : ComponentActivity() {
         Question(R.string.question_americas, true),
         Question(R.string.question_asia, true))
     private var currentIndex = 0
+    private var correctAnswers = 0
+    private var answeredQuestions = 0
+    private val totalQuestions = 6
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,20 +38,40 @@ class MainActivity : ComponentActivity() {
         previousButton = findViewById(R.id.previous_button)
         questionTextView = findViewById(R.id.question_text_view)
 
-        trueButton.setOnClickListener { view: View ->
+
+        trueButton.setOnClickListener {
             checkAnswer(true)
+            it.visibility = View.INVISIBLE
+            falseButton.visibility = View.INVISIBLE
+            answeredQuestions++
+            checkTestCompletion()
         }
-        falseButton.setOnClickListener { view: View ->
+
+        falseButton.setOnClickListener {
             checkAnswer(false)
+            it.visibility = View.INVISIBLE
+            trueButton.visibility = View.INVISIBLE
+            answeredQuestions++
+            checkTestCompletion()
         }
+
         questionTextView.setOnClickListener { view: View ->
             currentIndex = (currentIndex + 1) % questionBank.size
             updateQuestion()
         }
+
         nextButton.setOnClickListener {
-            currentIndex = (currentIndex + 1) % questionBank.size
+            if(currentIndex==5) {
+                it.visibility = View.INVISIBLE
+            }
+            else{
+                currentIndex = (currentIndex + 1) % questionBank.size
+            }
+            trueButton.visibility = View.VISIBLE
+            falseButton.visibility = View.VISIBLE
             updateQuestion()
         }
+
         previousButton.setOnClickListener {
             val messageResId = R.string.error_toast
             if(currentIndex==0) {
@@ -58,6 +81,7 @@ class MainActivity : ComponentActivity() {
             else{
                 currentIndex = (currentIndex - 1) % questionBank.size
             }
+            if(currentIndex!=5) nextButton.visibility = View.VISIBLE
             updateQuestion()
         }
         updateQuestion()
@@ -92,12 +116,30 @@ class MainActivity : ComponentActivity() {
     private fun checkAnswer(userAnswer: Boolean) {
         val correctAnswer = questionBank[currentIndex].answer
         val messageResId = if (userAnswer == correctAnswer) {
+            correctAnswers++
             R.string.correct_toast
         } else {
             R.string.incorrect_toast
         }
-        Toast.makeText(this, messageResId, Toast.LENGTH_SHORT)
-            .show()
+        Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun checkTestCompletion() {
+        if (answeredQuestions >= totalQuestions) {
+            showFinalResult()
+        }
+    }
+
+    private fun showFinalResult() {
+        val percentage = (correctAnswers.toFloat() / totalQuestions) * 100
+        val resultMessage = "Correct ansswers: \n$correctAnswers из $totalQuestions (${"%.1f".format(percentage)}%)"
+
+        Toast.makeText(this, resultMessage, Toast.LENGTH_LONG).show()
+
+        trueButton.visibility = View.GONE
+        falseButton.visibility = View.GONE
+        nextButton.visibility = View.GONE
+        previousButton.visibility = View.GONE
     }
 }
 
