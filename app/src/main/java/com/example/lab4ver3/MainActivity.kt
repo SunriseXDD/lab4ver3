@@ -23,10 +23,11 @@ class MainActivity : ComponentActivity() {
         Question(R.string.question_africa, false),
         Question(R.string.question_americas, true),
         Question(R.string.question_asia, true))
+
     private var currentIndex = 0
     private var correctAnswers = 0
     private var answeredQuestions = 0
-    private val totalQuestions = 6
+    private val totalQuestions = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,28 +62,24 @@ class MainActivity : ComponentActivity() {
         }
 
         nextButton.setOnClickListener {
-            if(currentIndex==5) {
-                it.visibility = View.INVISIBLE
+            if (currentIndex < questionBank.size - 1) {
+                currentIndex++
+                trueButton.visibility = View.VISIBLE
+                falseButton.visibility = View.VISIBLE
+                updateQuestion()
             }
-            else{
-                currentIndex = (currentIndex + 1) % questionBank.size
-            }
-            trueButton.visibility = View.VISIBLE
-            falseButton.visibility = View.VISIBLE
-            updateQuestion()
         }
 
         previousButton.setOnClickListener {
             val messageResId = R.string.error_toast
-            if(currentIndex==0) {
-                Toast.makeText(this, messageResId, Toast.LENGTH_SHORT)
-                    .show()
+            if (currentIndex > 0) {
+                currentIndex--
+                trueButton.visibility = View.VISIBLE
+                falseButton.visibility = View.VISIBLE
+                updateQuestion()
+            } else {
+                Toast.makeText(this, R.string.error_toast, Toast.LENGTH_SHORT).show()
             }
-            else{
-                currentIndex = (currentIndex - 1) % questionBank.size
-            }
-            if(currentIndex!=5) nextButton.visibility = View.VISIBLE
-            updateQuestion()
         }
         updateQuestion()
     }
