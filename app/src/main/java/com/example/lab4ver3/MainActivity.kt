@@ -51,6 +51,7 @@ class MainActivity : ComponentActivity() {
 
         trueButton.setOnClickListener {
             checkAnswer(true)
+            correctAnswers++
             it.visibility = View.INVISIBLE
             falseButton.visibility = View.INVISIBLE
             answeredQuestions++
@@ -176,7 +177,7 @@ class MainActivity : ComponentActivity() {
 
     private fun showFinalResult() {
         val percentage = (correctAnswers.toFloat() / totalQuestions) * 100
-        val resultMessage = "Correct ansswers: \n$correctAnswers из $totalQuestions (${"%.1f".format(percentage)}%)"
+        val resultMessage = "Correct answers: \n$correctAnswers из $totalQuestions (${"%.1f".format(percentage)}%)"
 
         Toast.makeText(this, resultMessage, Toast.LENGTH_LONG).show()
 
