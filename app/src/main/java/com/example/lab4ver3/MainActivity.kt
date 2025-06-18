@@ -7,7 +7,13 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.viewModels
+import androidx.lifecycle.ViewModelProvider
+import kotlin.jvm.java
+
+
 private const val TAG = "MainActivity"
+private const val KEY_INDEX = "index"
 
 class MainActivity : ComponentActivity() {
     private lateinit var trueButton: Button
@@ -16,23 +22,20 @@ class MainActivity : ComponentActivity() {
     private lateinit var previousButton: Button
     private lateinit var questionTextView: TextView
 
-    private val questionBank = listOf(
-        Question(R.string.question_australia, true),
-        Question(R.string.question_oceans, true),
-        Question(R.string.question_mideast, false),
-        Question(R.string.question_africa, false),
-        Question(R.string.question_americas, true),
-        Question(R.string.question_asia, true))
 
-    private var currentIndex = 0
     private var correctAnswers = 0
     private var answeredQuestions = 0
-    private val totalQuestions = 1
+    private val totalQuestions = 6
+    private val quizViewModel: QuizViewModel by viewModels()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate(Bundle?) called")
         setContentView(R.layout.activity_main)
+        val currentIndex = savedInstanceState?.getInt(KEY_INDEX, 0) ?: 0
+
+        quizViewModel.currentIndex = currentIndex
         trueButton = findViewById(R.id.true_button)
         falseButton = findViewById(R.id.false_button)
         nextButton = findViewById(R.id.next_button)
@@ -57,23 +60,22 @@ class MainActivity : ComponentActivity() {
         }
 
         questionTextView.setOnClickListener { view: View ->
-            currentIndex = (currentIndex + 1) % questionBank.size
+            quizViewModel.currentIndex = (quizViewModel.currentIndex + 1) % quizViewModel.questionBank.size
             updateQuestion()
         }
 
         nextButton.setOnClickListener {
-            if (currentIndex < questionBank.size - 1) {
-                currentIndex++
+            if (quizViewModel.currentIndex < quizViewModel.questionBank.size - 1) {
+                quizViewModel.moveToNext()
+                updateQuestion()
                 trueButton.visibility = View.VISIBLE
                 falseButton.visibility = View.VISIBLE
-                updateQuestion()
             }
         }
 
         previousButton.setOnClickListener {
-            val messageResId = R.string.error_toast
-            if (currentIndex > 0) {
-                currentIndex--
+            if (quizViewModel.questionBank.size > 0) {
+                quizViewModel.currentIndex--
                 trueButton.visibility = View.VISIBLE
                 falseButton.visibility = View.VISIBLE
                 updateQuestion()
@@ -96,6 +98,12 @@ class MainActivity : ComponentActivity() {
         super.onPause()
         Log.d(TAG, "onPause() called")
     }
+    override fun onSaveInstanceState(savedInstanceState: Bundle) {
+        super.onSaveInstanceState(savedInstanceState)
+        Log.i(TAG, "onSaveInstanceState")
+        savedInstanceState.putInt(KEY_INDEX, quizViewModel.currentIndex)
+    }
+
     override fun onStop() {
         super.onStop()
         Log.d(TAG, "onStop() called")
@@ -106,12 +114,12 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun updateQuestion() {
-        val questionTextResId = questionBank[currentIndex].textResId
+        val questionTextResId = quizViewModel.currentQuestionText
         questionTextView.setText(questionTextResId)
     }
 
     private fun checkAnswer(userAnswer: Boolean) {
-        val correctAnswer = questionBank[currentIndex].answer
+        val correctAnswer = quizViewModel.currentQuestionAnswer
         val messageResId = if (userAnswer == correctAnswer) {
             correctAnswers++
             R.string.correct_toast
@@ -139,6 +147,8 @@ class MainActivity : ComponentActivity() {
         previousButton.visibility = View.GONE
     }
 }
+
+
 
 
 
