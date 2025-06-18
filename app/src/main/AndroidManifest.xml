@@ -13,11 +13,16 @@
         android:theme="@style/Theme.Lab4ver3"
         tools:targetApi="31">
         <activity
+            android:name=".CheatActivity"
+            android:exported="false"
+            android:label="@string/title_activity_cheat"
+            android:theme="@style/Theme.Lab4ver3" />
+        <activity
             android:name=".MainActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Lab4ver3"
-            android:configChanges="orientation|screenSize|keyboardHidden">
+            android:theme="@style/Theme.Lab4ver3">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

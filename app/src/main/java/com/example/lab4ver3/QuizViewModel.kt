@@ -1,11 +1,12 @@
 package com.example.lab4ver3
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 
 private const val TAG = "QuizViewModel"
 class QuizViewModel : ViewModel() {
     var currentIndex = 0
+    var cheatCount = 3
+    var isCheater = false
     val questionBank = listOf(
         Question(R.string.question_australia,
             true),
